@@ -1,0 +1,25 @@
+#search-bar{
+  float: left;
+}
+
+.viewbox {
+  float: right; 
+ }
+
+.clearfix {
+    clear: both;
+}
+.view {
+  display:inline-block;
+}
+
+/*listmodel*/
+.lst {
+  margin: 10px;
+}
+
+#pagination-nav {
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
