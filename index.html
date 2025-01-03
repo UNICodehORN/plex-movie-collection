@@ -43,9 +43,16 @@
       <form class="form-inline">
         <label class="sr-only" for="inlineFormInputName2">Name</label>
         <input type="text" class="form-control mb-2 mr-sm-2" id="search" placeholder="Filme suchen...">
-        <button type="submit" class="btn btn-primary mb-2" id="submit-search">Suchen</button>
+        <button type="submit" class="btn btn-primary mb-2" id="submit-search">Suchen</button><br>
       </form>
     </div>
+    <div class="row" style="float:right;">
+      <button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="searchSteelbooks()">Steelbooks</button>
+      <button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="searchMediabook()">Mediabooks</button>
+      <button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="searchFourK()">4K</button>
+      <button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="searchAtmos()">Atmos</button>
+      <button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="searchThreeD()">3D</button>
+  </div>
     
     <!--view-->
   <div class="viewbox  ">
@@ -75,11 +82,11 @@
         </div>
         <div class="modal-body" id="show-movie-body">
           <div class="row">
-            <div class="col-sm-8" id="show-movie-image">
+            <div class="col-sm-6" id="show-movie-image">
             </div>
-            <div class="col-sm-4">
-              <p><em id="show-movie-date"></em></p>
+            <div class="col-sm-6">
               <p id="show-movie-description"></p>
+              <span id="show-movie-link"></span>
             </div>
           </div>
         </div>
