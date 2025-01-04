@@ -18,8 +18,8 @@ Movies can be filtered by special attributes (e.g. "Steelbooks").
 2. Move the files to a desired directory on your webserver.
 3. Export your desired plex movie collection with [WebTools-NG](https://github.com/WebTools-NG/WebTools-NG).
 4. Ensure you select all necessary fields (see movies/movielist.csv for an example export) and you also export the posters.
-5. Rename your csv-export to movielist.csv and move it into the movies subdirectory.
-6. Move all posters into movies subdirectory. Naming convention for posters should be "movie-name (year)/movie-name (year).jpg".
+5. Rename your csv-export to movielist.csv and move it into the *assets* subdirectory.
+6. Move all posters into *assets* subdirectory. Naming convention for posters should be "movie-name (year)/movie-name (year).jpg".
 7. Open the root of your webserver where you placed the files in your browser (e.g. http://127.0.0.1/)
 
 ## Credits

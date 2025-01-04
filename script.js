@@ -1,5 +1,5 @@
-const INDEX_URL = "./movies/movielist.csv";
-const POSTER_URL = "./movies/";
+const INDEX_URL = "./assets/movielist.csv";
+const POSTER_URL = "./assets/";
 var originalData = [];
 var data = [];
 
