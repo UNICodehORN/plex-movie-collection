@@ -1,12 +1,13 @@
 # Plex Movie Collection
 
-Static self-hostable website to visualize the own plex movie collection. 
+Simple static self-hostable website to visualize the own plex movie collection. 
 Allows to search for movies in the collection without need to grant access to plex server.
 
 Movies can be filtered by special attributes (e.g. "Steelbooks").
 
 ![Screenshot of frontpage](https://github.com/UNICodehORN/plex-movie-collection/blob/main/docs/images/main.png?raw=true)
-
+![Screenshot of detail view](https://github.com/UNICodehORN/plex-movie-collection/blob/main/docs/images/detail.png?raw=true)
+![Screenshot of pagination](https://github.com/UNICodehORN/plex-movie-collection/blob/main/docs/images/pagination.png?raw=true)
 
 ## Requirements
 1. Export from Plex movie collection with [WebTools-NG](https://github.com/WebTools-NG/WebTools-NG)
