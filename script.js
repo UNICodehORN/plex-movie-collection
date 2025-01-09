@@ -1,7 +1,9 @@
 const INDEX_URL = "./assets/movielist.csv";
+const CONFIG_URL = "./config/config.json";
 const POSTER_URL = "./assets/";
 var originalData = [];
 var data = [];
+var config = [];
 
 const dataPanel = document.getElementById("data-panel");
 const searchBtn = document.getElementById("submit-search");
@@ -19,11 +21,16 @@ const listModel = document.getElementById("btn-listModel");
     axios
         .get(INDEX_URL)
         .then(response => {
-            //data.push(...response.data.results);
-            processData(csvToJson(response.data))
-            getTotalPages(data);
-            // displayDataList(data)
-            displayRandom();
+            axios
+                .get(CONFIG_URL)
+                .then(configJson => {
+                    config = configJson.data;
+                    processData(csvToJson(response.data))
+                    getTotalPages(data);
+                    displayFilterBtn();
+                    displayRandom();
+                })
+                .catch(err => console.log(err));
         })
         .catch(err => console.log(err));
 
@@ -87,36 +94,51 @@ function csvToJson(csvString) {
 
 function processData(dataToProcess) {
     for (let i = 0; i < dataToProcess.length; i++) {
-        let title = dataToProcess[i]["Title"].replace(":", "").replace("?", "").replace("B.C.", "B.C");
-        let imagePath = title + " (" + dataToProcess[i]["Year"] + ")/" + title + " (" + dataToProcess[i]["Year"] + ").jpg";
+        let dataEntry = dataToProcess[i];
+        let title = dataEntry["Title"].replace(":", "").replace("?", "").replace("B.C.", "B.C");
+        let imagePath = title + " (" + dataEntry["Year"] + ")/" + title + " (" + dataEntry["Year"] + ").jpg";
         imagePath = encodeURI(imagePath);
-        let steelbook = false;
-        let fourK = false;
-        let gerAtmos = false;
-        let mediaBook = false;
-        let threeD = false;
-        if (dataToProcess[i]["Part File Combined"].toLowerCase().includes("steelbook")) steelbook = true;
-        if (dataToProcess[i]["Part File Combined"].toLowerCase().includes("mediabook")) mediaBook = true;
-        if (dataToProcess[i]["Part File Combined"].toLowerCase().includes("-uhd")) fourK = true;
-        if (dataToProcess[i]["Part File Combined"].toLowerCase().includes("-3d")) threeD = true;
-        if (dataToProcess[i]["Audio Stream Display Title"].toLowerCase().includes("deutsch (truehd 7.1)")) gerAtmos = true;
-
+        if (dataEntry["Audio Stream Display Title"].toLowerCase().includes("deutsch (truehd 7.1)")) gerAtmos = true;
+        dataEntry = applyFilterToData(dataEntry)
         data.push({
-            "id": dataToProcess[i]["TMDB ID"],
-            "title": dataToProcess[i]["Title"],
-            "duration": dataToProcess[i]["Duration"],
-            "link": dataToProcess[i]["IMDB Link"],
-            "year": dataToProcess[i]["Year"],
-            "description": dataToProcess[i]["Summary"],
+            "id": dataEntry["TMDB ID"],
+            "title": dataEntry["Title"],
+            "duration": dataEntry["Duration"],
+            "link": dataEntry["IMDB Link"],
+            "year": dataEntry["Year"],
+            "description": dataEntry["Summary"],
             "image": imagePath,
-            "fourK": fourK,
-            "steelbook": steelbook,
-            "mediabook": mediaBook,
-            "gerAtmos": gerAtmos,
-            "threeD": threeD,
+            "filter": dataEntry.filter
         });
     }
     originalData = data;
+}
+
+function displayFilterBtn() {
+    let btnHtml = ``;
+    for (let i = 0; i < config.filter.length; i++) {
+        btnHtml += `
+                <button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="filterFor('${config.filter[i]["name"]}')">${config.filter[i]["label"]}</button>
+        `;
+    }
+    btnHtml += `<button class="btn btn-danger mb-2" style="margin-right:10px;" onclick="filterFor('')">Reset</button>`;
+    $("#filter").html(btnHtml);
+}
+
+function applyFilterToData(dataEntry) {
+    let filters = config.filter;
+    let modifiedDataEntry = dataEntry;
+    modifiedDataEntry["filter"] = [];
+    for (let i = 0; i < filters.length; i++) {
+        if (filterRuleTriggers(filters[i], dataEntry)) {
+            modifiedDataEntry["filter"][filters[i]['name']] = true;
+        }
+    }
+    return modifiedDataEntry;
+}
+
+function filterRuleTriggers(filter, dataEntry) {
+    return filter.rule === "contains" && dataEntry[filter.field] !== undefined && dataEntry[filter.field].includes(filter.needle);
 }
 
 function getTotalPages(data) {
@@ -152,16 +174,13 @@ function getPageDatalistModel(pageNum) {
 function displayDataList(data) {
     let htmlContent = "";
     data.forEach(function (item, index) {
-        let steelbook = ``;
-        if (item.steelbook) steelbook = `<button class="btn btn-info">Steelbook</button>`;
-        let fourK = ``;
-        if (item.fourK) fourK = `<button class="btn btn-info">4K</button>`;
-        let gerAtmos = ``;
-        if (item.gerAtmos) gerAtmos = `<button class="btn btn-info">Dolby Atmos</button>`;
-        let mediaBook = ``;
-        if (item.mediabook) mediaBook = `<button class="btn btn-info">Mediabook</button>`;
-        let threeD = ``;
-        if (item.threeD) threeD = `<button class="btn btn-info">3D</button>`;
+        let filterBtn = ``;
+        config.filter.forEach(
+            function (filter) {
+                if (item["filter"][filter["name"]]) {
+                    filterBtn += ` <button class="btn btn-info">${filter["label"]}</button>`;
+                }
+            });
         htmlContent += `
         <div class="col-sm-3">
           <div class="card mb-2">
@@ -173,11 +192,7 @@ function displayDataList(data) {
             </div>
             <!-- "More" button -->
             <div class="card-footer">
-              ${steelbook}
-              ${mediaBook}
-              ${fourK}
-              ${threeD}
-              ${gerAtmos}
+              ${filterBtn}
               <button class="btn btn-primary btn-show-movie" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id}">More</button>
                 <!-- favorite button -->
               <!--<button class="btn btn-info btn-add-favorite" data-id="${
@@ -191,26 +206,19 @@ function displayDataList(data) {
     dataPanel.innerHTML = htmlContent;
 }
 
-function searchSteelbooks() {
-    let steelbooks = [];
-    for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i]["steelbook"])
-            steelbooks.push(originalData[i]);
+function filterFor(filterName) {
+    let filteredEntries = [];
+    if (filterName === '') {
+        filteredEntries = originalData;
+    } else {
+        for (let i = 0; i < originalData.length; i++) {
+            if (originalData[i]["filter"][filterName])
+                filteredEntries.push(originalData[i]);
+        }
     }
-    data = steelbooks;
-    getTotalPages(steelbooks);
-    getPageData(1, steelbooks);
-}
-
-function searchFourK() {
-    let fourK = [];
-    for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i]["fourK"])
-            fourK.push(originalData[i]);
-    }
-    data = fourK;
-    getTotalPages(fourK);
-    getPageData(1, fourK);
+    data = filteredEntries;
+    getTotalPages(filteredEntries);
+    getPageData(1, filteredEntries);
 }
 
 function displayRandom() {
@@ -225,39 +233,6 @@ function shuffleArray(array) {
         const j = Math.floor(Math.random() * (i + 1));
         [array[i], array[j]] = [array[j], array[i]];
     }
-}
-
-function searchAtmos() {
-    let atmos = [];
-    for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i]["gerAtmos"])
-            atmos.push(originalData[i]);
-    }
-    data = atmos;
-    getTotalPages(atmos);
-    getPageData(1, atmos);
-}
-
-function searchThreeD() {
-    let threeD = [];
-    for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i]["threeD"])
-            threeD.push(originalData[i]);
-    }
-    data = threeD;
-    getTotalPages(threeD);
-    getPageData(1, threeD);
-}
-
-function searchMediabook() {
-    let mediabook = [];
-    for (let i = 0; i < originalData.length; i++) {
-        if (originalData[i]["mediabook"])
-            mediabook.push(originalData[i]);
-    }
-    data = mediabook;
-    getTotalPages(mediabook);
-    getPageData(1, mediabook);
 }
 
 function displayDataListModel(data) {

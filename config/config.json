@@ -1,0 +1,39 @@
+{
+  "filter": [
+    {
+      "name": "threeD",
+      "label": "3D",
+      "field": "Part File Combined",
+      "rule": "contains",
+      "needle": "-3D"
+    },
+    {
+      "name": "fourK",
+      "label": "4K",
+      "field": "Part File Combined",
+      "rule": "contains",
+      "needle": "-UHD"
+    },
+    {
+      "name": "steelbook",
+      "label": "Steelbook",
+      "field": "Part File Combined",
+      "rule": "contains",
+      "needle": "Steelbook"
+    },
+    {
+      "name": "mediabook",
+      "label": "Mediabook",
+      "field": "Part File Combined",
+      "rule": "contains",
+      "needle": "Mediabook"
+    },
+    {
+      "name": "mediabook",
+      "label": "Mediabook",
+      "field": "Audio Stream Display Title",
+      "rule": "contains",
+      "needle": "Deutsch (TRUEHD 7.1)"
+    }
+  ]
+}
