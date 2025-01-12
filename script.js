@@ -1,6 +1,7 @@
 const INDEX_URL = "./assets/movielist.csv";
 const CONFIG_URL = "./config/config.json";
-const POSTER_URL = "./assets/";
+const POSTER_URL = "./assets/poster/";
+const ICON_URL = "./assets/css/icons/";
 var originalData = [];
 var data = [];
 var config = [];
@@ -117,9 +118,12 @@ function processData(dataToProcess) {
 function displayFilterBtn() {
     let btnHtml = ``;
     for (let i = 0; i < config.filter.length; i++) {
-        btnHtml += `
-                <button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="filterFor('${config.filter[i]["name"]}')">${config.filter[i]["label"]}</button>
+        if (config.filter[i]["labelOnly"] !== true) {
+            let icon = config.filter[i]["icon"] !== undefined ? `<img class='icn' src='${ICON_URL}${config.filter[i].icon}.svg' />` : "";
+            btnHtml +=
+                `<button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="filterFor('${config.filter[i]["name"]}')">${icon} ${config.filter[i]["label"]}</button>
         `;
+        }
     }
     btnHtml += `<button class="btn btn-danger mb-2" style="margin-right:10px;" onclick="filterFor('')">Reset</button>`;
     $("#filter").html(btnHtml);
@@ -178,26 +182,21 @@ function displayDataList(data) {
         config.filter.forEach(
             function (filter) {
                 if (item["filter"][filter["name"]]) {
-                    filterBtn += ` <button class="btn btn-info">${filter["label"]}</button>`;
+                    let btnCss = "btn-info";
+                    if (filter["btn-css"] !== undefined) btnCss = filter["btn-css"];
+                    let label = filter["icon"] !== undefined ? `<img class="icn" src="${ICON_URL}${filter["icon"]}.svg"/>` : `${filter["label"]}`;
+                    filterBtn += ` <button class="btn btn-label ${btnCss} mb-2" onclick="filterFor('${filter["name"]}')">${label}</button>`;
                 }
             });
         htmlContent += `
         <div class="col-sm-3">
           <div class="card mb-2">
-            <img class="card-img-top " src="${POSTER_URL}${
+            <img class="card-img-top btn-show-movie" src="${POSTER_URL}${
             item.image
-        }" alt="Card image cap">
-            <div class="card-body movie-item-body">
-              <h6 class="card-title">${item.title}</h5>
-            </div>
+        }" alt="${item.title} Movie Poster" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id}"/>
             <!-- "More" button -->
-            <div class="card-footer">
+            <div class="card-footer" style="min-height:60px">
               ${filterBtn}
-              <button class="btn btn-primary btn-show-movie" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id}">More</button>
-                <!-- favorite button -->
-              <!--<button class="btn btn-info btn-add-favorite" data-id="${
-            item.id
-        }">+</button>-->
             </div>
           </div>
         </div>
@@ -274,6 +273,10 @@ function showMovie(id) {
             break;
         }
     }
+    console.log("id: "+id);
+    console.log(data);
+    console.log("found movie:");
+    console.log(movie);
 
     // insert data into modal ui
     modalTitle.textContent = `${movie.title} (${movie.year}) - ${movie.duration}`;

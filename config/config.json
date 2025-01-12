@@ -2,24 +2,47 @@
   "filter": [
     {
       "name": "threeD",
-      "label": "3D",
+      "label": "",
+      "icon": "desktop-computer-3d",
       "field": "Part File Combined",
       "rule": "contains",
-      "needle": "-3D"
+      "needle": "-3D",
+      "btn-css": "btn-black"
+    },
+    {
+      "name": "hd",
+      "label": "",
+      "icon": "hd-display",
+      "field": "Part File Combined",
+      "rule": "contains",
+      "needle": "-FHD",
+      "labelOnly": true,
+      "btn-css": "btn-primary"
     },
     {
       "name": "fourK",
-      "label": "4K",
+      "label": "",
+      "icon": "badge-4k",
       "field": "Part File Combined",
       "rule": "contains",
       "needle": "-UHD"
+    },
+    {
+      "name": "hdr",
+      "label": "",
+      "icon": "hdr",
+      "field": "Part File Combined",
+      "rule": "contains",
+      "needle": "-UHD",
+      "labelOnly": true
     },
     {
       "name": "steelbook",
       "label": "Steelbook",
       "field": "Part File Combined",
       "rule": "contains",
-      "needle": "Steelbook"
+      "needle": "Steelbook",
+      "btn-css": "btn-grey"
     },
     {
       "name": "mediabook",
@@ -29,8 +52,9 @@
       "needle": "Mediabook"
     },
     {
-      "name": "mediabook",
-      "label": "Mediabook",
+      "name": "atmos",
+      "label": "Atmos",
+      "icon": "dolby",
       "field": "Audio Stream Display Title",
       "rule": "contains",
       "needle": "Deutsch (TRUEHD 7.1)"
