@@ -1,0 +1,46 @@
+#search-bar{
+  float: left;
+}
+
+.viewbox {
+  float: right; 
+ }
+
+.clearfix {
+    clear: both;
+}
+.view {
+  display:inline-block;
+}
+
+/*listmodel*/
+.lst {
+  margin: 10px;
+}
+
+#pagination-nav {
+  max-width: 300px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.btn-label{
+    font-size:8pt;
+    padding: 5px;
+}
+
+.icn {
+    filter:brightness(0) invert(1);
+    width:17px;
+    height:17px;
+}
+
+.btn-black{
+    color: #ffffff;
+    background-color:#000000FF;
+}
+
+.btn-grey{
+    color: #ffffff;
+    background-color: #535353;
+}

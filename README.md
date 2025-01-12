@@ -17,10 +17,10 @@ Movies can be filtered by special attributes (e.g. "Steelbooks").
 1. Just clone or download the files in this repo.
 2. Move the files to a desired directory on your webserver.
 3. Export your desired plex movie collection with [WebTools-NG](https://github.com/WebTools-NG/WebTools-NG).
-4. Ensure you select all necessary fields (see movies/movielist.csv for an example export) and you also export the posters.
+4. Ensure you select all necessary fields (see assets/movielist.csv for an example export) and you also export the posters.
 5. Rename your csv-export to movielist.csv and move it into the *assets* subdirectory.
-6. Move all posters into *assets* subdirectory. Naming convention for posters should be "movie-name (year)/movie-name (year).jpg".
-7. Open the root of your webserver where you placed the files in your browser (e.g. http://127.0.0.1/)
+6. Move all posters into *assets/poster* subdirectory. Naming convention for posters should be "movie-name (year)/movie-name (year).jpg".
+7. Open the root of your webserver where you placed the files in your browser (e.g. http://127.0.0.1/subdir)
 
 ## Filter
 In config/config.json you can define filters which are displayed as buttons at the top and allow to filter the entire collection
@@ -38,6 +38,14 @@ Currently the only rule supported is 'contains'.
 The rule triggers when *field* *contains* the *needle*.
 #### needle
 Case sensitive needle to use for the rule if applicable.
+#### icon (optional)
+Name of an icon in assets/css directory which can be used instead of the label.
+#### labelOnly (default: false)
+If set to true, in filters icon will be displayed in front of label.
+In movie card it will be used instead of the label.
+#### btn-css (optional)
+Css class(es) to add to the filter button in movie card.
+Can be used to change font and background color for example.
 
 ## Credits
 The website is based on the CSS template by Li Shang [https://codepen.io/li-shang/pen/KEKowv](https://codepen.io/li-shang/pen/KEKowv).
