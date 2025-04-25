@@ -196,6 +196,7 @@ function displayDataList(data) {
         }" alt="${item.title} Movie Poster" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id}"/>
             <!-- "More" button -->
             <div class="card-footer" style="min-height:60px">
+              <a href="https://www.youtube.com/results?search_query=${item.title} ${item.year} trailer" target="_blank"><button class="btn btn-label btn-danger mb-2"><img class="icn" src="${ICON_URL}yt.svg"></button></a>
               ${filterBtn}
             </div>
           </div>
