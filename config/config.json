@@ -1,6 +1,15 @@
 {
   "filter": [
     {
+      "name": "borrowed",
+      "label": "Geliehen",
+      "icon": "friends",
+      "field": "Part File Combined",
+      "rule": "contains",
+      "needle": "Borrowed",
+      "btn-css": "btn-warning"
+    },
+    {
       "name": "threeD",
       "label": "",
       "icon": "desktop-computer-3d",
