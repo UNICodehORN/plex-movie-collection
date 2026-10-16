@@ -15,14 +15,34 @@ Movies can be filtered by special attributes (e.g. "Steelbooks").
 
 ## Setup
 1. Just clone or download the files in this repo.
-2. Move the files to a desired directory on your webserver.
-3. Export your desired plex movie collection with [WebTools-NG](https://github.com/WebTools-NG/WebTools-NG).
-4. Ensure you select all necessary fields (see assets/movielist.csv for an example export) and you also export the posters.
-5. Rename your csv-export to movielist.csv and move it into the *assets* subdirectory.
-6. Move all posters into *assets/poster* subdirectory. Naming convention for posters should be "movie-name (year)/movie-name (year).jpg".
-7. Open the root of your webserver where you placed the files in your browser (e.g. http://127.0.0.1/subdir)
+2. Create your own configuration by copying the example config:
+   `cp config/config.example.json config/config.json`
+   The `config/config.json` file is gitignored, so your local configuration will never be committed accidentally.
+3. Move the files to a desired directory on your webserver.
+4. Export your desired plex movie collection with [WebTools-NG](https://github.com/WebTools-NG/WebTools-NG).
+5. Ensure you select all necessary fields (see assets/movielist.csv for an example export) and you also export the posters.
+6. Rename your csv-export to movielist.csv and move it into the *assets* subdirectory (or adjust the paths in your config, see below).
+7. Move all posters into *assets/poster* subdirectory. Naming convention for posters should be "movie-name (year)/movie-name (year).jpg".
+8. Open the root of your webserver where you placed the files in your browser (e.g. http://127.0.0.1/subdir)
 
-## Filter
+> Only `config/config.example.json` is tracked in git. Create your own `config/config.json` from it after checkout. The real config is listed in `.gitignore` and will not be uploaded by a git commit.
+
+## Config
+In config/config.json you can define the paths to your assets and the filters which are displayed as buttons at the top and allow to filter the entire collection for some defined rules.
+
+### Paths
+All asset paths are configurable under the `paths` key. If a path is omitted, the default value is used.
+
+#### movielist (default: ./assets/movielist.csv)
+Path to the csv export of your plex collection.
+
+#### poster (default: ./assets/poster/)
+Base path to the directory containing the movie posters.
+
+#### icon (default: ./assets/css/icons/)
+Base path to the directory containing the filter icons.
+
+### Filter
 In config/config.json you can define filters which are displayed as buttons at the top and allow to filter the entire collection
 for some defined rules.
 ### Filter Parameters

@@ -1,4 +1,9 @@
 {
+  "paths": {
+    "movielist": "./assets/movielist.csv",
+    "poster": "./assets/poster/",
+    "icon": "./assets/css/icons/"
+  },
   "filter": [
     {
       "name": "borrowed",

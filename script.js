@@ -1,7 +1,10 @@
-const INDEX_URL = "./assets/movielist.csv";
 const CONFIG_URL = "./config/config.json";
-const POSTER_URL = "./assets/poster/";
-const ICON_URL = "./assets/css/icons/";
+const DEFAULT_PATHS = {
+    movielist: "./assets/movielist.csv",
+    poster: "./assets/poster/",
+    icon: "./assets/css/icons/"
+};
+var paths = { ...DEFAULT_PATHS };
 var originalData = [];
 var data = [];
 var config = [];
@@ -20,18 +23,17 @@ const listModel = document.getElementById("btn-listModel");
 
     // Load data
     axios
-        .get(INDEX_URL)
+        .get(CONFIG_URL)
+        .then(configJson => {
+            config = configJson.data;
+            paths = { ...DEFAULT_PATHS, ...(config.paths || {}) };
+            return axios.get(paths.movielist);
+        })
         .then(response => {
-            axios
-                .get(CONFIG_URL)
-                .then(configJson => {
-                    config = configJson.data;
-                    processData(csvToJson(response.data))
-                    getTotalPages(data);
-                    displayFilterBtn();
-                    displayRandom();
-                })
-                .catch(err => console.log(err));
+            processData(csvToJson(response.data))
+            getTotalPages(data);
+            displayFilterBtn();
+            displayRandom();
         })
         .catch(err => console.log(err));
 
@@ -119,7 +121,7 @@ function displayFilterBtn() {
     let btnHtml = ``;
     for (let i = 0; i < config.filter.length; i++) {
         if (config.filter[i]["labelOnly"] !== true) {
-            let icon = config.filter[i]["icon"] !== undefined ? `<img class='icn' src='${ICON_URL}${config.filter[i].icon}.svg' />` : "";
+            let icon = config.filter[i]["icon"] !== undefined ? `<img class='icn' src='${paths.icon}${config.filter[i].icon}.svg' />` : "";
             btnHtml +=
                 `<button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="filterFor('${config.filter[i]["name"]}')">${icon} ${config.filter[i]["label"]}</button>
         `;
@@ -184,19 +186,19 @@ function displayDataList(data) {
                 if (item["filter"][filter["name"]]) {
                     let btnCss = "btn-info";
                     if (filter["btn-css"] !== undefined) btnCss = filter["btn-css"];
-                    let label = filter["icon"] !== undefined ? `<img class="icn" src="${ICON_URL}${filter["icon"]}.svg"/>` : `${filter["label"]}`;
+                    let label = filter["icon"] !== undefined ? `<img class="icn" src="${paths.icon}${filter["icon"]}.svg"/>` : `${filter["label"]}`;
                     filterBtn += ` <button class="btn btn-label ${btnCss} mb-2" onclick="filterFor('${filter["name"]}')">${label}</button>`;
                 }
             });
         htmlContent += `
         <div class="col-sm-3">
           <div class="card mb-2">
-            <img class="card-img-top btn-show-movie" src="${POSTER_URL}${
+            <img class="card-img-top btn-show-movie" src="${paths.poster}${
             item.image
         }" alt="${item.title} Movie Poster" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id}"/>
             <!-- "More" button -->
             <div class="card-footer" style="min-height:60px">
-              <a href="https://www.youtube.com/results?search_query=${item.title} ${item.year} trailer" target="_blank"><button class="btn btn-label btn-danger mb-2"><img class="icn" src="${ICON_URL}yt.svg"></button></a>
+              <a href="https://www.youtube.com/results?search_query=${item.title} ${item.year} trailer" target="_blank"><button class="btn btn-label btn-danger mb-2"><img class="icn" src="${paths.icon}yt.svg"></button></a>
               ${filterBtn}
             </div>
           </div>
@@ -281,7 +283,7 @@ function showMovie(id) {
 
     // insert data into modal ui
     modalTitle.textContent = `${movie.title} (${movie.year}) - ${movie.duration}`;
-    modalImage.innerHTML = `<img src="${POSTER_URL}${
+    modalImage.innerHTML = `<img src="${paths.poster}${
         movie.image
     }" class="img-fluid" alt="Responsive image">`;
     modalDescription.textContent = `${movie.description}`;
