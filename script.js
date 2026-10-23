@@ -57,21 +57,24 @@ function ensureModalInBody() {
     });
 
     // listen to search btn click event
-    searchBtn.addEventListener("click", event => {
-        event.preventDefault();
+    if (searchBtn) {
+        searchBtn.addEventListener("click", event => {
+            event.preventDefault();
 
-        let results = [];
-        if (searchInput.value !== "") {
-            const regex = new RegExp(searchInput.value, "i");
+            let results = [];
+            if (searchInput && searchInput.value !== "") {
+                const regex = new RegExp(searchInput.value, "i");
 
-            results = data.filter(movie => movie.title.match(regex));
-            data = results;
-        } else {
-            data = originalData;
-        }
-        getTotalPages(data);
-        getPageData(1, data);
-    });
+                results = originalData.filter(movie => movie.title.match(regex));
+                data = results;
+            } else {
+                data = originalData;
+            }
+            currentPage = 1;
+            getTotalPages(data);
+            getPageData(1, data);
+        });
+    }
 
     //listen to viewbox
     if (listModel) {
