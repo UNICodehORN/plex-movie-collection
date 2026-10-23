@@ -3,6 +3,7 @@
 }
 
 .viewbox {
+  display: none;
   float: right; 
  }
 
@@ -19,9 +20,46 @@
 }
 
 #pagination-nav {
-  max-width: 300px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 2rem auto;
+  text-align: center;
+}
+
+#pagination .pagination {
+  gap: 0.35rem;
+  margin-bottom: 0;
+}
+
+#pagination .page-link {
+  min-width: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border: none;
+  border-radius: 0.5rem;
+  color: #495057;
+  background-color: #f1f3f5;
+  font-weight: 500;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+#pagination .page-link:hover {
+  color: #0d6efd;
+  background-color: #e2e6ea;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+#pagination .page-item.active .page-link {
+  color: #ffffff;
+  background-color: #0d6efd;
+  box-shadow: 0 3px 8px rgba(13, 110, 253, 0.4);
+}
+
+#pagination .page-item.disabled .page-link {
+  color: #adb5bd;
+  background-color: transparent;
+  box-shadow: none;
+  transform: none;
 }
 
 .btn-label{
@@ -43,4 +81,85 @@
 .btn-grey{
     color: #ffffff;
     background-color: #535353;
+}
+
+/* poster placeholder + lazy loading */
+.poster-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    background-color: #e9ecef;
+    border-top-left-radius: 0.25rem;
+    border-top-right-radius: 0.25rem;
+}
+
+.poster-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 20%, rgba(255, 255, 255, 0.6) 50%, transparent 80%);
+    transform: translateX(-100%);
+    animation: poster-shimmer 1.4s ease-in-out infinite;
+}
+
+.poster-wrapper.loaded {
+    background-color: #ffffff;
+}
+
+.poster-wrapper.loaded::after {
+    display: none;
+}
+
+.poster-img {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.poster-img.loaded {
+    opacity: 1;
+}
+
+@keyframes poster-shimmer {
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .poster-wrapper::after {
+        animation: none;
+    }
+
+    .poster-img {
+        transition: none;
+    }
+}
+
+.modal {
+    z-index: 10650;
+}
+
+.modal-backdrop {
+    z-index: 10600;
+}
+
+.modal-dialog {
+    margin-top: 6rem;
+}
+
+@media (max-width: 991px) {
+    .modal-dialog {
+        margin-top: 5rem;
+    }
+}
+
+body.modal-open {
+    overflow: hidden;
+    padding-right: 0 !important;
 }

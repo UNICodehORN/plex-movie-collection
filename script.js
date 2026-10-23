@@ -16,8 +16,19 @@ const searchInput = document.getElementById("search");
 const pagination = document.getElementById("pagination");
 const ITEM_PER_PAGE = 12;
 let paginationData = [];
+let currentPage = 1;
 
 const listModel = document.getElementById("btn-listModel");
+
+function ensureModalInBody() {
+    if (typeof $ === 'undefined') {
+        return;
+    }
+    const $modal = $('#show-movie-modal');
+    if ($modal.length && $modal.parent()[0] !== document.body) {
+        $modal.appendTo('body');
+    }
+}
 
 (function () {
 
@@ -40,6 +51,7 @@ const listModel = document.getElementById("btn-listModel");
     // listen to data panel
     dataPanel.addEventListener("click", event => {
         if (event.target.matches(".btn-show-movie")) {
+            ensureModalInBody();
             showMovie(event.target.dataset.id);
         }
     });
@@ -62,11 +74,24 @@ const listModel = document.getElementById("btn-listModel");
     });
 
     //listen to viewbox
-    listModel.addEventListener("click", event => {
-        if (event.target.matches("#btn-listModel")) {
-            displayDataListModel(data);
-        }
-    });
+    if (listModel) {
+        listModel.addEventListener("click", event => {
+            if (event.target.matches("#btn-listModel")) {
+                displayDataListModel(data);
+            }
+        });
+    }
+
+    if (typeof $ !== 'undefined') {
+        $(document).on('click', '[data-target="#show-movie-modal"][data-id]', function () {
+            ensureModalInBody();
+        });
+
+        $(document).on('show.bs.modal', '#show-movie-modal', function () {
+            ensureModalInBody();
+            $('.modal-backdrop').appendTo('body');
+        });
+    }
 
 })();
 
@@ -148,15 +173,61 @@ function filterRuleTriggers(filter, dataEntry) {
 }
 
 function getTotalPages(data) {
-    let totalPages = Math.ceil(data.length / ITEM_PER_PAGE) || 1;
-    let pageItemContent = "";
-    for (let i = 0; i < totalPages; i++) {
-        pageItemContent += `
-          <a class="lst" href="#" onclick="getPage(${i + 1})" data-page="${i + 1}">${i +
-        1}</a>
-      `;
-    }
+    paginationData = data || paginationData;
+    currentPage = 1;
+    renderPagination();
+}
+
+function renderPagination() {
+    const totalPages = Math.max(1, Math.ceil(paginationData.length / ITEM_PER_PAGE));
+    currentPage = Math.min(Math.max(1, currentPage), totalPages);
+    const pages = getPaginationRange(currentPage, totalPages);
+
+    let pageItemContent = `<ul class="pagination justify-content-center flex-wrap">`;
+
+    pageItemContent += `
+        <li class="page-item ${currentPage === 1 ? "disabled" : ""}">
+            <a class="page-link" href="#" aria-label="Previous" ${currentPage === 1 ? "" : `onclick="getPage(${currentPage - 1}); return false;"`}>
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>`;
+
+    pages.forEach(page => {
+        if (page === "...") {
+            pageItemContent += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+        } else if (page === currentPage) {
+            pageItemContent += `<li class="page-item active" aria-current="page"><span class="page-link">${page}</span></li>`;
+        } else {
+            pageItemContent += `<li class="page-item"><a class="page-link" href="#" onclick="getPage(${page}); return false;">${page}</a></li>`;
+        }
+    });
+
+    pageItemContent += `
+        <li class="page-item ${currentPage === totalPages ? "disabled" : ""}">
+            <a class="page-link" href="#" aria-label="Next" ${currentPage === totalPages ? "" : `onclick="getPage(${currentPage + 1}); return false;"`}>
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>`;
+
     pagination.innerHTML = pageItemContent;
+}
+
+function getPaginationRange(current, total) {
+    if (total <= 7) {
+        return Array.from({ length: total }, (_, i) => i + 1);
+    }
+
+    const range = [1];
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+
+    if (start > 2) range.push("...");
+    for (let i = start; i <= end; i++) range.push(i);
+    if (end < total - 1) range.push("...");
+    range.push(total);
+
+    return range;
 }
 
 function getPage(pageNum) {
@@ -165,6 +236,9 @@ function getPage(pageNum) {
 
 function getPageData(pageNum, movieData) {
     paginationData = movieData || paginationData;
+    currentPage = pageNum;
+    renderPagination();
+
     let offset = (pageNum - 1) * ITEM_PER_PAGE;
     let pageData = paginationData.slice(offset, offset + ITEM_PER_PAGE);
     displayDataList(pageData);
@@ -193,9 +267,11 @@ function displayDataList(data) {
         htmlContent += `
         <div class="col-sm-3">
           <div class="card mb-2">
-            <img class="card-img-top btn-show-movie" src="${paths.poster}${
+            <div class="poster-wrapper">
+              <img class="card-img-top poster-img btn-show-movie" src="${paths.poster}${
             item.image
-        }" alt="${item.title} Movie Poster" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id}"/>
+        }" alt="${item.title} Movie Poster" loading="lazy" onload="this.classList.add('loaded'); this.parentElement.classList.add('loaded')" data-toggle="modal" data-target="#show-movie-modal" data-id="${item.id}"/>
+            </div>
             <!-- "More" button -->
             <div class="card-footer" style="min-height:60px">
               <a href="https://www.youtube.com/results?search_query=${item.title} ${item.year} trailer" target="_blank"><button class="btn btn-label btn-danger mb-2"><img class="icn" src="${paths.icon}yt.svg"></button></a>
