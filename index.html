@@ -29,17 +29,17 @@
 <!-- data-panel -->
 <div class="container mt-5 ">
     <!--search bar-->
+    <div id="filter" class="row mb-2">
+    </div>
     <div class="row" id="search-bar">
-        <form class="form-inline">
+        <form class="form-inline w-100">
             <label class="sr-only" for="inlineFormInputName2">Name</label>
-            <input type="text" class="form-control mb-2 mr-sm-2" id="search" placeholder="Search Movie...">
+            <input type="text" class="form-control form-control-lg mb-2 mr-sm-2 flex-grow-1" id="search" placeholder="Search Movie..." style="min-width:300px;">
             <label class="sr-only" for="sort-select">Sortierung</label>
-            <select class="form-control mb-2 mr-sm-2" id="sort-select"></select>
-            <button type="submit" class="btn btn-primary mb-2" id="submit-search">Search</button>
+            <select class="form-control form-control-lg mb-2 mr-sm-2" id="sort-select"></select>
+            <button type="submit" class="btn btn-primary btn-lg mb-2" id="submit-search">Search</button>
             <br>
         </form>
-    </div>
-    <div id="filter" class="row" style="float:right;">
     </div>
 
     <!--view-->
