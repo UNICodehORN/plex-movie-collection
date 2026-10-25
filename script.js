@@ -208,7 +208,8 @@ function processData(dataToProcess) {
             "description": dataEntry["Summary"],
             "image": imagePath,
             "filter": dataEntry.filter,
-            "order": i
+            "order": i,
+            "added": dataEntry["Added"] || dataEntry["AddedAt"] || ""
         });
     }
     originalData = data;
@@ -381,6 +382,12 @@ function durationToSeconds(duration) {
     return Number(duration) || 0;
 }
 
+function parseAdded(value) {
+    if (!value) return 0;
+    const time = Date.parse(String(value).trim());
+    return isNaN(time) ? 0 : time;
+}
+
 function sortMovies(movies, sort) {
     const arr = [...movies];
     switch (sort) {
@@ -388,10 +395,10 @@ function sortMovies(movies, sort) {
             shuffleArray(arr);
             break;
         case "newest":
-            arr.sort((a, b) => (b.order || 0) - (a.order || 0));
+            arr.sort((a, b) => parseAdded(b.added) - parseAdded(a.added) || (b.order || 0) - (a.order || 0));
             break;
         case "oldest":
-            arr.sort((a, b) => (a.order || 0) - (b.order || 0));
+            arr.sort((a, b) => parseAdded(a.added) - parseAdded(b.added) || (a.order || 0) - (b.order || 0));
             break;
         case "az":
             arr.sort((a, b) => String(a.title).localeCompare(String(b.title), "de", { sensitivity: "base" }));
