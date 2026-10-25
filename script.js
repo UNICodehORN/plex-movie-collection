@@ -12,8 +12,9 @@ var config = [];
 const dataPanel = document.getElementById("data-panel");
 const searchBtn = document.getElementById("submit-search");
 const searchInput = document.getElementById("search");
-const sortSelect = document.getElementById("sort-select");
+let sortSelect = null;
 let currentSort = "random";
+const isGerman = (navigator.language || "en").toLowerCase().startsWith("de");
 
 const pagination = document.getElementById("pagination");
 const ITEM_PER_PAGE = 12;
@@ -31,6 +32,44 @@ const SORT_OPTIONS = [
     { value: "duration-asc", label: "Dauer: Kürzeste zuerst" },
     { value: "duration-desc", label: "Dauer: Längste zuerst" }
 ];
+
+const T = isGerman ? {
+    search: "Suchen",
+    reset: "Zurücksetzen",
+    sortLabel: "Sortierung",
+    borrowed: "Geliehen",
+    searchPlaceholder: "Film suchen..."
+} : {
+    search: "Search",
+    reset: "Reset",
+    sortLabel: "Sort",
+    borrowed: "Borrowed",
+    searchPlaceholder: "Search Movie..."
+};
+
+function getSortOptions() {
+    return isGerman ? [
+        { value: "random", label: "Zufällig" },
+        { value: "newest", label: "Neuste zuerst" },
+        { value: "oldest", label: "Älteste zuerst" },
+        { value: "az", label: "A-Z" },
+        { value: "za", label: "Z-A" },
+        { value: "year-asc", label: "Erscheinungsjahr: Älteste zuerst" },
+        { value: "year-desc", label: "Erscheinungsjahr: Neuste zuerst" },
+        { value: "duration-asc", label: "Dauer: Kürzeste zuerst" },
+        { value: "duration-desc", label: "Dauer: Längste zuerst" }
+    ] : [
+        { value: "random", label: "Random" },
+        { value: "newest", label: "Newest first" },
+        { value: "oldest", label: "Oldest first" },
+        { value: "az", label: "A-Z" },
+        { value: "za", label: "Z-A" },
+        { value: "year-asc", label: "Release year: Oldest first" },
+        { value: "year-desc", label: "Release year: Newest first" },
+        { value: "duration-asc", label: "Duration: Shortest first" },
+        { value: "duration-desc", label: "Duration: Longest first" }
+    ];
+}
 
 const listModel = document.getElementById("btn-listModel");
 
@@ -57,7 +96,8 @@ function ensureModalInBody() {
         .then(response => {
             processData(csvToJson(response.data))
             displayFilterBtn();
-            displaySortDropdown();
+            if (searchBtn) searchBtn.textContent = T.search;
+            if (searchInput) searchInput.placeholder = T.searchPlaceholder;
             currentSort = sortSelect ? sortSelect.value : "random";
             data = sortMovies([...originalData], currentSort);
             getTotalPages(data);
@@ -93,16 +133,16 @@ function ensureModalInBody() {
         });
     }
 
-    // listen to sort change
-    if (sortSelect) {
-        sortSelect.addEventListener("change", event => {
-            currentSort = sortSelect.value;
+    // listen to sort change (delegated, since select is rendered later)
+    document.addEventListener("change", event => {
+        if (event.target && event.target.id === "sort-select") {
+            currentSort = event.target.value;
             data = sortMovies([...data], currentSort);
             currentPage = 1;
             getTotalPages(data);
             getPageData(1, data);
-        });
-    }
+        }
+    });
 
     //listen to viewbox
     if (listModel) {
@@ -174,18 +214,29 @@ function processData(dataToProcess) {
     originalData = data;
 }
 
+function filterLabel(filter) {
+    if (filter.labelOnly) return "";
+    if (isGerman) return filter.label;
+    if (filter.name === "borrowed") return T.borrowed;
+    return filter.label;
+}
+
 function displayFilterBtn() {
     let btnHtml = ``;
     for (let i = 0; i < config.filter.length; i++) {
         if (config.filter[i]["labelOnly"] !== true) {
             let icon = config.filter[i]["icon"] !== undefined ? `<img class='icn' src='${paths.icon}${config.filter[i].icon}.svg' />` : "";
+            let label = filterLabel(config.filter[i]);
             btnHtml +=
-                `<button class="btn btn-primary btn-sm mb-2" style="margin-right:5px;" onclick="filterFor('${config.filter[i]["name"]}')">${icon} ${config.filter[i]["label"]}</button>
+                `<button class="btn btn-primary btn-sm mb-2" style="margin-right:5px;" onclick="filterFor('${config.filter[i]["name"]}')">${icon} ${label}</button>
         `;
         }
     }
-    btnHtml += `<button class="btn btn-danger btn-sm mb-2" style="margin-right:5px;" onclick="filterFor('')">Reset</button>`;
+    btnHtml += `<button class="btn btn-danger btn-sm mb-2" style="margin-right:5px;" onclick="filterFor('')">${T.reset}</button>`;
+    btnHtml += `<select id="sort-select" class="form-control form-control-sm mb-2 ml-2" style="width:auto; display:inline-block;"></select>`;
     $("#filter").html(btnHtml);
+    sortSelect = document.getElementById("sort-select");
+    displaySortDropdown();
 }
 
 function applyFilterToData(dataEntry) {
@@ -318,7 +369,7 @@ function displayDataList(data) {
 
 function displaySortDropdown() {
     if (!sortSelect) return;
-    sortSelect.innerHTML = SORT_OPTIONS.map(option => `<option value="${option.value}">${option.label}</option>`).join("");
+    sortSelect.innerHTML = getSortOptions().map(option => `<option value="${option.value}">${option.label}</option>`).join("");
     sortSelect.value = currentSort;
 }
 
