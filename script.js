@@ -180,11 +180,11 @@ function displayFilterBtn() {
         if (config.filter[i]["labelOnly"] !== true) {
             let icon = config.filter[i]["icon"] !== undefined ? `<img class='icn' src='${paths.icon}${config.filter[i].icon}.svg' />` : "";
             btnHtml +=
-                `<button class="btn btn-primary mb-2" style="margin-right:10px;" onclick="filterFor('${config.filter[i]["name"]}')">${icon} ${config.filter[i]["label"]}</button>
+                `<button class="btn btn-primary btn-sm mb-2" style="margin-right:5px;" onclick="filterFor('${config.filter[i]["name"]}')">${icon} ${config.filter[i]["label"]}</button>
         `;
         }
     }
-    btnHtml += `<button class="btn btn-danger mb-2" style="margin-right:10px;" onclick="filterFor('')">Reset</button>`;
+    btnHtml += `<button class="btn btn-danger btn-sm mb-2" style="margin-right:5px;" onclick="filterFor('')">Reset</button>`;
     $("#filter").html(btnHtml);
 }
 
