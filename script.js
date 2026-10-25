@@ -12,11 +12,25 @@ var config = [];
 const dataPanel = document.getElementById("data-panel");
 const searchBtn = document.getElementById("submit-search");
 const searchInput = document.getElementById("search");
+const sortSelect = document.getElementById("sort-select");
+let currentSort = "random";
 
 const pagination = document.getElementById("pagination");
 const ITEM_PER_PAGE = 12;
 let paginationData = [];
 let currentPage = 1;
+
+const SORT_OPTIONS = [
+    { value: "random", label: "Zufällig" },
+    { value: "newest", label: "Neuste zuerst" },
+    { value: "oldest", label: "Älteste zuerst" },
+    { value: "az", label: "A-Z" },
+    { value: "za", label: "Z-A" },
+    { value: "year-asc", label: "Erscheinungsjahr: Älteste zuerst" },
+    { value: "year-desc", label: "Erscheinungsjahr: Neuste zuerst" },
+    { value: "duration-asc", label: "Dauer: Kürzeste zuerst" },
+    { value: "duration-desc", label: "Dauer: Längste zuerst" }
+];
 
 const listModel = document.getElementById("btn-listModel");
 
@@ -42,9 +56,12 @@ function ensureModalInBody() {
         })
         .then(response => {
             processData(csvToJson(response.data))
-            getTotalPages(data);
             displayFilterBtn();
-            displayRandom();
+            displaySortDropdown();
+            currentSort = sortSelect ? sortSelect.value : "random";
+            data = sortMovies([...originalData], currentSort);
+            getTotalPages(data);
+            getPageData(1, data);
         })
         .catch(err => console.log(err));
 
@@ -66,10 +83,21 @@ function ensureModalInBody() {
                 const regex = new RegExp(searchInput.value, "i");
 
                 results = originalData.filter(movie => movie.title.match(regex));
-                data = results;
             } else {
-                data = originalData;
+                results = [...originalData];
             }
+            data = sortMovies(results, currentSort);
+            currentPage = 1;
+            getTotalPages(data);
+            getPageData(1, data);
+        });
+    }
+
+    // listen to sort change
+    if (sortSelect) {
+        sortSelect.addEventListener("change", event => {
+            currentSort = sortSelect.value;
+            data = sortMovies([...data], currentSort);
             currentPage = 1;
             getTotalPages(data);
             getPageData(1, data);
@@ -139,7 +167,8 @@ function processData(dataToProcess) {
             "year": dataEntry["Year"],
             "description": dataEntry["Summary"],
             "image": imagePath,
-            "filter": dataEntry.filter
+            "filter": dataEntry.filter,
+            "order": i
         });
     }
     originalData = data;
@@ -287,19 +316,69 @@ function displayDataList(data) {
     dataPanel.innerHTML = htmlContent;
 }
 
+function displaySortDropdown() {
+    if (!sortSelect) return;
+    sortSelect.innerHTML = SORT_OPTIONS.map(option => `<option value="${option.value}">${option.label}</option>`).join("");
+    sortSelect.value = currentSort;
+}
+
+function durationToSeconds(duration) {
+    if (!duration) return 0;
+    const parts = String(duration).split(":").map(part => Number(part));
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    return Number(duration) || 0;
+}
+
+function sortMovies(movies, sort) {
+    const arr = [...movies];
+    switch (sort) {
+        case "random":
+            shuffleArray(arr);
+            break;
+        case "newest":
+            arr.sort((a, b) => (b.order || 0) - (a.order || 0));
+            break;
+        case "oldest":
+            arr.sort((a, b) => (a.order || 0) - (b.order || 0));
+            break;
+        case "az":
+            arr.sort((a, b) => String(a.title).localeCompare(String(b.title), "de", { sensitivity: "base" }));
+            break;
+        case "za":
+            arr.sort((a, b) => String(b.title).localeCompare(String(a.title), "de", { sensitivity: "base" }));
+            break;
+        case "year-asc":
+            arr.sort((a, b) => (Number(a.year) || 0) - (Number(b.year) || 0) || String(a.title).localeCompare(String(b.title)));
+            break;
+        case "year-desc":
+            arr.sort((a, b) => (Number(b.year) || 0) - (Number(a.year) || 0) || String(a.title).localeCompare(String(b.title)));
+            break;
+        case "duration-asc":
+            arr.sort((a, b) => durationToSeconds(a.duration) - durationToSeconds(b.duration));
+            break;
+        case "duration-desc":
+            arr.sort((a, b) => durationToSeconds(b.duration) - durationToSeconds(a.duration));
+            break;
+        default:
+            break;
+    }
+    return arr;
+}
+
 function filterFor(filterName) {
     let filteredEntries = [];
     if (filterName === '') {
-        filteredEntries = originalData;
+        filteredEntries = [...originalData];
     } else {
         for (let i = 0; i < originalData.length; i++) {
             if (originalData[i]["filter"][filterName])
                 filteredEntries.push(originalData[i]);
         }
     }
-    data = filteredEntries;
-    getTotalPages(filteredEntries);
-    getPageData(1, filteredEntries);
+    data = sortMovies(filteredEntries, currentSort);
+    getTotalPages(data);
+    getPageData(1, data);
 }
 
 function displayRandom() {
