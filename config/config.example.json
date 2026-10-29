@@ -71,7 +71,7 @@
       "icon": "dolby",
       "field": "Audio Stream Display Title",
       "rule": "contains",
-      "needle": "Deutsch (TRUEHD 7.1)"
+      "needle": "Atmos"
     }
   ]
 }

@@ -56,9 +56,9 @@ Will be used for the filter button as label and for each movie as label.
 Name of the field in movielist.csv where the rule should be checked.
 #### rule
 Currently the only rule supported is 'contains'. 
-The rule triggers when *field* *contains* the *needle*.
+The rule triggers when *field* contains *needle*, ignoring letter case. The Atmos filter also recognizes audio display titles containing "Atmos" or both "TrueHD" and "7.1", regardless of language or punctuation.
 #### needle
-Case sensitive needle to use for the rule if applicable.
+Text to search for in the field.
 #### icon (optional)
 Name of an icon in assets/css directory which can be used instead of the label.
 #### labelOnly (default: false)

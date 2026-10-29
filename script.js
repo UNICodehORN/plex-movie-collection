@@ -197,7 +197,6 @@ function processData(dataToProcess) {
         let title = dataEntry["Title"].replace(":", "").replace("?", "").replace("B.C.", "B.C");
         let imagePath = title + " (" + dataEntry["Year"] + ")/" + title + " (" + dataEntry["Year"] + ").jpg";
         imagePath = encodeURI(imagePath);
-        if (dataEntry["Audio Stream Display Title"].toLowerCase().includes("deutsch (truehd 7.1)")) gerAtmos = true;
         dataEntry = applyFilterToData(dataEntry)
         data.push({
             "id": dataEntry["TMDB ID"],
@@ -253,7 +252,14 @@ function applyFilterToData(dataEntry) {
 }
 
 function filterRuleTriggers(filter, dataEntry) {
-    return filter.rule === "contains" && dataEntry[filter.field] !== undefined && dataEntry[filter.field].includes(filter.needle);
+    if (filter.rule !== "contains" || dataEntry[filter.field] === undefined || filter.needle === undefined) {
+        return false;
+    }
+    const value = String(dataEntry[filter.field]).toLowerCase();
+    if (filter.name === "atmos") {
+        return value.includes("atmos") || (value.includes("truehd") && value.includes("7.1"));
+    }
+    return value.includes(String(filter.needle).toLowerCase());
 }
 
 function getTotalPages(data) {
